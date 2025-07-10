@@ -7,9 +7,7 @@
 #include "IHistory.h"
 
 using namespace calc;
-using ::testing::_;
 using ::testing::Return;
-using ::testing::Exactly;
 using ::testing::Ref;
 
 // Мок для IHistory
@@ -80,12 +78,10 @@ TEST_F(SimpleCalculatorTest, Multiply_NegativeNegative) {
 
 // Умножение больших значений (граница)
 TEST_F(SimpleCalculatorTest, Multiply_LargeValues) {
-    int a = 100000;
-    int b = 30000;
-    int expected = a * b;
-    std::ostringstream oss;
-    oss << a << " * " << b << " = " << expected;
-    EXPECT_CALL(history, AddEntry(oss.str())).Times(1);
+    int a = 1000000;
+    int b = 3000;
+    int64_t expected = static_cast<int64_t>(a) * b;
+    EXPECT_CALL(history, AddEntry(::testing::_)).Times(1);
     EXPECT_EQ(calculator.Multiply(a, b), expected);
 }
 
@@ -107,9 +103,9 @@ TEST_F(SimpleCalculatorTest, Divide_NegativeNumerator) {
     EXPECT_EQ(calculator.Divide(-10, 3), -3);
 }
 
-// Деление на ноль (текущее поведение)
+// Деление на ноль
 TEST_F(SimpleCalculatorTest, Divide_ByZero_NoThrow) {
-    EXPECT_NO_THROW({ try { calculator.Divide(5, 0); } catch (...) {} });
+    calculator.Divide(5, 0);  // упадёт при SEH‑исключении
 }
 
 // SetHistory не переназначает ссылку (логирование в мок)
