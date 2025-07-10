@@ -1,4 +1,3 @@
-// tests/calculator_tests.cpp
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -13,14 +12,14 @@ using ::testing::Return;
 using ::testing::Exactly;
 using ::testing::Ref;
 
-// Мок для IHistory
+// ГЊГ®ГЄ Г¤Г«Гї IHistory
 class MockHistory : public IHistory {
 public:
     MOCK_METHOD(void, AddEntry, (const std::string& operation), (override));
     MOCK_METHOD(std::vector<std::string>, GetLastOperations, (size_t count), (const, override));
 };
 
-// Мок для ICalculator
+// ГЊГ®ГЄ Г¤Г«Гї ICalculator
 class MockCalculator : public ICalculator {
 public:
     MOCK_METHOD(int, Add, (int a, int b), (override));
@@ -30,56 +29,56 @@ public:
     MOCK_METHOD(void, SetHistory, (IHistory& history), (override));
 };
 
-// Фикстура для реального калькулятора с моком истории
+// Г”ГЁГЄГ±ГІГіГ°Г  Г¤Г«Гї Г°ГҐГ Г«ГјГ­Г®ГЈГ® ГЄГ Г«ГјГЄГіГ«ГїГІГ®Г°Г  Г± Г¬Г®ГЄГ®Г¬ ГЁГ±ГІГ®Г°ГЁГЁ
 class SimpleCalculatorTest : public ::testing::Test {
 protected:
     MockHistory history;
     SimpleCalculator calculator{ history };
 };
 
-// Сложение
+// Г‘Г«Г®Г¦ГҐГ­ГЁГҐ
 TEST_F(SimpleCalculatorTest, Add_ReturnsSumAndLogs) {
     EXPECT_CALL(history, AddEntry("2 + 2 = 4")).Times(1);
     EXPECT_EQ(calculator.Add(2, 2), 4);
 }
 
-// Сложение отрицательных
+// Г‘Г«Г®Г¦ГҐГ­ГЁГҐ Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г»Гµ
 TEST_F(SimpleCalculatorTest, Add_Negatives) {
     EXPECT_CALL(history, AddEntry("-2 + -3 = -5")).Times(1);
     EXPECT_EQ(calculator.Add(-2, -3), -5);
 }
 
-// Вычитание
+// Г‚Г»Г·ГЁГІГ Г­ГЁГҐ
 TEST_F(SimpleCalculatorTest, Subtract_ReturnsDiffAndLogs) {
     EXPECT_CALL(history, AddEntry("5 - 3 = 2")).Times(1);
     EXPECT_EQ(calculator.Subtract(5, 3), 2);
 }
 
-// Вычитание с отрицательным результатом
+// Г‚Г»Г·ГЁГІГ Г­ГЁГҐ Г± Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г»Г¬ Г°ГҐГ§ГіГ«ГјГІГ ГІГ®Г¬
 TEST_F(SimpleCalculatorTest, Subtract_NegativeResult) {
     EXPECT_CALL(history, AddEntry("3 - 5 = -2")).Times(1);
     EXPECT_EQ(calculator.Subtract(3, 5), -2);
 }
 
-// Умножение на ноль
+// Г“Г¬Г­Г®Г¦ГҐГ­ГЁГҐ Г­Г  Г­Г®Г«Гј
 TEST_F(SimpleCalculatorTest, Multiply_ByZero) {
     EXPECT_CALL(history, AddEntry("7 * 0 = 0")).Times(1);
     EXPECT_EQ(calculator.Multiply(7, 0), 0);
 }
 
-// Умножение положительного и отрицательного
+// Г“Г¬Г­Г®Г¦ГҐГ­ГЁГҐ ГЇГ®Г«Г®Г¦ГЁГІГҐГ«ГјГ­Г®ГЈГ® ГЁ Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г®ГЈГ®
 TEST_F(SimpleCalculatorTest, Multiply_PositiveNegative) {
     EXPECT_CALL(history, AddEntry("-4 * 5 = -20")).Times(1);
     EXPECT_EQ(calculator.Multiply(-4, 5), -20);
 }
 
-// Умножение двух отрицательных
+// Г“Г¬Г­Г®Г¦ГҐГ­ГЁГҐ Г¤ГўГіГµ Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г»Гµ
 TEST_F(SimpleCalculatorTest, Multiply_NegativeNegative) {
     EXPECT_CALL(history, AddEntry("-4 * -5 = 20")).Times(1);
     EXPECT_EQ(calculator.Multiply(-4, -5), 20);
 }
 
-// Умножение больших значений (граница)
+// Г“Г¬Г­Г®Г¦ГҐГ­ГЁГҐ ГЎГ®Г«ГјГёГЁГµ Г§Г­Г Г·ГҐГ­ГЁГ© (ГЈГ°Г Г­ГЁГ¶Г )
 TEST_F(SimpleCalculatorTest, Multiply_LargeValues) {
     int a = 100000;
     int b = 30000;
@@ -90,30 +89,30 @@ TEST_F(SimpleCalculatorTest, Multiply_LargeValues) {
     EXPECT_EQ(calculator.Multiply(a, b), expected);
 }
 
-// Деление без остатка
+// Г„ГҐГ«ГҐГ­ГЁГҐ ГЎГҐГ§ Г®Г±ГІГ ГІГЄГ 
 TEST_F(SimpleCalculatorTest, Divide_ReturnsQuotient) {
     EXPECT_CALL(history, AddEntry("10 / 2 = 5")).Times(1);
     EXPECT_EQ(calculator.Divide(10, 2), 5);
 }
 
-// Деление с остатком
+// Г„ГҐГ«ГҐГ­ГЁГҐ Г± Г®Г±ГІГ ГІГЄГ®Г¬
 TEST_F(SimpleCalculatorTest, Divide_WithRemainder) {
     EXPECT_CALL(history, AddEntry("7 / 2 = 3")).Times(1);
     EXPECT_EQ(calculator.Divide(7, 2), 3);
 }
 
-// Деление отрицательных
+// Г„ГҐГ«ГҐГ­ГЁГҐ Г®ГІГ°ГЁГ¶Г ГІГҐГ«ГјГ­Г»Гµ
 TEST_F(SimpleCalculatorTest, Divide_NegativeNumerator) {
     EXPECT_CALL(history, AddEntry("-10 / 3 = -3")).Times(1);
     EXPECT_EQ(calculator.Divide(-10, 3), -3);
 }
 
-// Деление на ноль (текущее поведение)
+// Г„ГҐГ«ГҐГ­ГЁГҐ Г­Г  Г­Г®Г«Гј (ГІГҐГЄГіГ№ГҐГҐ ГЇГ®ГўГҐГ¤ГҐГ­ГЁГҐ)
 TEST_F(SimpleCalculatorTest, Divide_ByZero_NoThrow) {
     EXPECT_NO_THROW({ try { calculator.Divide(5, 0); } catch (...) {} });
 }
 
-// SetHistory не переназначает ссылку (логирование в мок)
+// SetHistory Г­ГҐ ГЇГҐГ°ГҐГ­Г Г§Г­Г Г·Г ГҐГІ Г±Г±Г»Г«ГЄГі (Г«Г®ГЈГЁГ°Г®ГўГ Г­ГЁГҐ Гў Г¬Г®ГЄ)
 TEST_F(SimpleCalculatorTest, SetHistory_DoesNotRebindReference) {
     InMemoryHistory mem;
     EXPECT_CALL(history, AddEntry("1 + 1 = 2")).Times(1);
@@ -121,15 +120,15 @@ TEST_F(SimpleCalculatorTest, SetHistory_DoesNotRebindReference) {
     calculator.Add(1, 1);
 }
 
-// Моки на интерфейс калькулятора и история
-// Роль мока калькулятора: проверяем вызовы
+// ГЊГ®ГЄГЁ Г­Г  ГЁГ­ГІГҐГ°ГґГҐГ©Г± ГЄГ Г«ГјГЄГіГ«ГїГІГ®Г°Г  ГЁ ГЁГ±ГІГ®Г°ГЁГї
+// ГђГ®Г«Гј Г¬Г®ГЄГ  ГЄГ Г«ГјГЄГіГ«ГїГІГ®Г°Г : ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ ГўГ»Г§Г®ГўГ»
 TEST(MockCalculatorTest, CalculatorMock_AddCalled) {
     MockCalculator mockCalc;
     EXPECT_CALL(mockCalc, Add(2, 3)).Times(1).WillOnce(Return(5));
     EXPECT_EQ(mockCalc.Add(2, 3), 5);
 }
 
-// Мок калькулятора SetHistory вызывается
+// ГЊГ®ГЄ ГЄГ Г«ГјГЄГіГ«ГїГІГ®Г°Г  SetHistory ГўГ»Г§Г»ГўГ ГҐГІГ±Гї
 TEST(MockCalculatorTest, CalculatorMock_SetHistoryCalled) {
     MockCalculator mockCalc;
     InMemoryHistory realHistory;
@@ -137,7 +136,7 @@ TEST(MockCalculatorTest, CalculatorMock_SetHistoryCalled) {
     mockCalc.SetHistory(realHistory);
 }
 
-// Мок калькулятора не влияет на реальную историю
+// ГЊГ®ГЄ ГЄГ Г«ГјГЄГіГ«ГїГІГ®Г°Г  Г­ГҐ ГўГ«ГЁГїГҐГІ Г­Г  Г°ГҐГ Г«ГјГ­ГіГѕ ГЁГ±ГІГ®Г°ГЁГѕ
 TEST(MockCalculatorIntegration, MockCalcDoesNotLogToRealHistory) {
     MockCalculator mockCalc;
     InMemoryHistory realHistory;
@@ -147,8 +146,8 @@ TEST(MockCalculatorIntegration, MockCalcDoesNotLogToRealHistory) {
     EXPECT_TRUE(realHistory.GetLastOperations(1).empty());
 }
 
-// Тесты для InMemoryHistory
-// Добавление и получение
+// Г’ГҐГ±ГІГ» Г¤Г«Гї InMemoryHistory
+// Г„Г®ГЎГ ГўГ«ГҐГ­ГЁГҐ ГЁ ГЇГ®Г«ГіГ·ГҐГ­ГЁГҐ
 TEST(InMemoryHistoryTest, AddAndRetrieveEntries) {
     InMemoryHistory history;
     history.AddEntry("op1"); history.AddEntry("op2"); history.AddEntry("op3");
@@ -173,7 +172,7 @@ TEST(InMemoryHistoryTest, GetLastOperations_ZeroCount) {
     EXPECT_TRUE(history.GetLastOperations(0).empty());
 }
 
-// Проверка отсутствия переполнения истории
+// ГЏГ°Г®ГўГҐГ°ГЄГ  Г®ГІГ±ГіГІГ±ГІГўГЁГї ГЇГҐГ°ГҐГЇГ®Г«Г­ГҐГ­ГЁГї ГЁГ±ГІГ®Г°ГЁГЁ
 TEST(InMemoryHistoryTest, History_NoOverflow_AllEntriesStored) {
     InMemoryHistory history;
     const size_t kCount = 100;
